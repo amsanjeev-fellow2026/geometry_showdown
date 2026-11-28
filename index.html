@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1033"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Geometry Showdown - The Shape Rescue</title>
+<style>
+:root{--ink:#0b1033;--v1:#150d52;--v2:#33198a;--v3:#6a2cb8;--cy:#38e8ff;--pk:#ff4f9a;--gold:#ffd23f;--grn:#2ee6a6;--red:#ff5d6c;--navy:#1b2a6b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:min(1.25vw,2.2vh)}
+@media (orientation:portrait){html{font-size:2.1vw}}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:ui-rounded,"SF Pro Rounded",Nunito,"Segoe UI",Verdana,sans-serif;background:var(--ink);color:var(--navy);user-select:none;-webkit-user-select:none}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:.15rem solid #fff;border-radius:3rem;background:linear-gradient(#fff,#e3e8ff);padding:.7rem 1.3rem;font-weight:800;min-height:3rem;box-shadow:0 .28rem 0 rgba(10,10,60,.45);touch-action:manipulation;transition:transform .12s,filter .12s}
+button:hover:not(:disabled){filter:brightness(1.06)}
+button:active{transform:translateY(.15rem);box-shadow:0 .1rem 0 rgba(10,10,60,.45)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:.25rem solid var(--gold);outline-offset:.1rem}
+button:disabled{opacity:.45;cursor:default}
+.primary{background:linear-gradient(#ff6fb0,#d81b6a);color:#fff;font-size:1.5rem;padding:.9rem 2.2rem;border-color:#ffd0e6;box-shadow:0 .35rem 0 #7d0e42,0 0 1.4rem rgba(255,79,154,.55)}
+.gold{background:linear-gradient(#ffe27a,#ffb300);color:#3b2600;border-color:#fff3c4;box-shadow:0 .35rem 0 #a56d00,0 0 1.4rem rgba(255,210,63,.5)}
+.danger{background:linear-gradient(#ff7a85,#d63446);color:#fff}
+.on{background:linear-gradient(#2ee6a6,#12a577)!important;color:#05301f}
+.big{font-size:1.7rem;padding:.8rem 2rem;min-width:min(26rem,86vw)}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+#bar{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;padding:.4rem .8rem;background:linear-gradient(90deg,#0b1033,#2a1a6e);border-bottom:.2rem solid var(--cy);color:#fff;flex:none;z-index:5}
+#bar button{min-height:2.6rem;padding:.3rem .9rem;color:var(--ink)}
+#who{font-size:1.4rem;font-weight:900;color:var(--cy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:30vw}
+.stat{background:linear-gradient(#b9f6ff,#38e8ff);color:var(--ink);border-radius:2rem;padding:.35rem .9rem;font-weight:900;white-space:nowrap}
+#dots{display:flex;gap:.35rem;margin:0 auto}
+#dots i{width:1.5rem;height:1.5rem;border-radius:50%;border:.15rem solid #fff;font:bold .8rem/1.2rem sans-serif;text-align:center;font-style:normal}
+#dots i.d{background:var(--grn);color:#05301f}#dots i.c{background:var(--pk)}
+#view{flex:1;position:relative;overflow:hidden;background:linear-gradient(135deg,#0b1033,#2a1a6e 50%,#4b1f8f);background-size:200% 200%;animation:bgmove 18s ease-in-out infinite alternate}
+@keyframes bgmove{to{background-position:100% 100%}}
+#foot{flex:none;text-align:center;font-size:.85rem;padding:.2rem;background:#0b1033;color:#a7b4ff;border-top:.12rem solid #2a1a6e}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:1rem;padding:1rem;text-align:center;overflow:auto;z-index:2}
+.screen>.card{flex-shrink:0;position:relative;z-index:1}
+.card{background:linear-gradient(rgba(255,255,255,.97),rgba(233,238,255,.97));border:.22rem solid var(--cy);border-radius:2.4rem .9rem;padding:1.3rem 1.8rem;box-shadow:0 .8rem 2rem rgba(0,0,30,.55),0 0 0 .4rem rgba(255,255,255,.18),0 0 2.4rem rgba(56,232,255,.35);max-width:62rem;animation:pop .35s ease}
+h1{font-size:3.6rem;line-height:1.05}h2{font-size:2.2rem}h3{font-size:1.4rem}
+p{font-size:1.3rem;line-height:1.4}
+.small{font-size:1rem}
+.row{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center;align-items:center}
+.col{display:flex;flex-direction:column;gap:.7rem;align-items:center}
+.wide{width:100%}
+.err{color:#c4162f;font-weight:800}
+.badge{background:linear-gradient(#d8fff4,#9af3d9);border-radius:2rem;padding:.4rem 1rem;font-weight:800;font-size:1.05rem}
+input#code,input.txt{font-size:1.8rem;text-align:center;border:.22rem solid var(--v3);border-radius:3rem;padding:.4rem 1rem;background:#fff}
+input#code{text-transform:uppercase;letter-spacing:.15em;width:15rem}
+textarea.txt{font-size:1.2rem;border:.22rem solid var(--v3);border-radius:1.2rem;padding:.6rem;width:min(34rem,86vw);height:9rem;background:#fff;text-align:left;user-select:text;-webkit-user-select:text}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+@keyframes bob{50%{transform:translateY(-.7rem)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1.2)}}
+@keyframes floaty{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3rem) rotate(180deg)}100%{transform:translateY(0) rotate(360deg)}}
+@keyframes shoot{0%{transform:translate(0,0) rotate(30deg);opacity:0}8%{opacity:1}100%{transform:translate(-70vw,50vh) rotate(30deg);opacity:0}}
+@keyframes letter{0%,40%,100%{transform:none}20%{transform:translateY(-.6rem) scale(1.08)}}
+@keyframes pulse{50%{box-shadow:0 .35rem 0 #7d0e42,0 0 0 .8rem rgba(255,79,154,.4)}}
+@keyframes flow{to{stroke-dashoffset:-60}}
+@keyframes glow{50%{filter:drop-shadow(0 0 1rem var(--gold)) brightness(1.2);border-color:var(--gold)}}
+@keyframes shake{25%{transform:translateX(-.5rem)}75%{transform:translateX(.5rem)}}
+@keyframes rise{to{transform:translateY(-110vh)}}
+@keyframes conf{to{transform:translateY(110vh) rotate(720deg)}}
+@keyframes fxpop{0%{transform:scale(.3);opacity:0}40%{opacity:1}100%{transform:scale(1.7) translateY(-3rem);opacity:0}}
+@keyframes sweep{from{transform:translateX(-120%)}to{transform:translateX(220%)}}
+.bob{animation:bob 2.6s ease-in-out infinite}
+.flow{stroke-dasharray:14 16;animation:flow 1s linear infinite}
+.shake{animation:shake .4s}
+.glow{animation:glow .6s ease 4}
+.scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s ease-in-out infinite}
+.shape{position:absolute;color:var(--cy);animation:floaty 14s ease-in-out infinite;filter:drop-shadow(0 0 .5rem currentColor);opacity:.8}
+.shoot{position:absolute;width:9rem;height:.18rem;background:linear-gradient(90deg,transparent,#fff);animation:shoot 5s linear infinite;opacity:0}
+.planet{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb3d9,#a83292 60%,#4a1a6e);box-shadow:0 0 3rem rgba(255,79,154,.5)}
+.ring{position:absolute;border:.5rem solid rgba(255,210,63,.55);border-radius:50%;transform:rotateX(72deg) rotate(-12deg)}
+.proto{position:absolute;left:50%;bottom:-32vh;width:90vh;height:90vh;margin-left:-45vh;opacity:.2;animation:spin 90s linear infinite}
+.home .card{background:rgba(240,244,255,.92);max-width:36rem;padding:1rem 1.6rem;gap:.5rem}
+.home h1{font-size:3rem}
+.home .primary{animation:pulse 1.6s ease-in-out infinite}
+.title{font-weight:900;letter-spacing:.03em;color:#2a1a8f;text-shadow:0 .18rem 0 #b9f6ff}
+.title span{display:inline-block;animation:letter 2.4s ease-in-out infinite}
+.title span:nth-child(even){color:#d81b6a;text-shadow:0 .18rem 0 #ffd0e6}
+.title .sub{display:block;animation:none;font-size:1.3rem;color:var(--ink);text-shadow:none;letter-spacing:.12em;margin-top:.2rem}
+.mascot{width:5rem;filter:drop-shadow(0 0 1rem rgba(56,232,255,.9))}
+.act{position:absolute;inset:0;display:flex;flex-direction:column;padding:.6rem .9rem;gap:.5rem;z-index:2}
+.ask{background:linear-gradient(90deg,#2a1a8f,#6a2cb8);color:#fff;border:.15rem solid var(--cy);border-radius:3rem;padding:.55rem 1.2rem;font-size:1.4rem;font-weight:900;text-align:center;flex:none;box-shadow:0 .2rem .8rem rgba(0,0,30,.4)}
+.stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;gap:1rem}
+.stage>svg{width:100%;height:100%}
+.tray{flex:none;display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;min-height:4rem;align-items:center}
+.tile{background:linear-gradient(#fff3c4,#ffd277);border:.15rem solid #fff;border-radius:1.8rem .6rem;padding:.7rem 1.2rem;font-weight:900;font-size:1.35rem;touch-action:none;cursor:grab;box-shadow:0 .28rem 0 #b5762a;max-width:24rem;text-align:center;color:var(--ink)}
+.tile svg{width:13rem;height:auto;display:block}
+.tile.sel{background:linear-gradient(#ff6fb0,#d81b6a);color:#fff;transform:scale(1.06)}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg)}
+.zones{display:grid;gap:.7rem;width:100%;height:100%}
+.zone{background:rgba(255,255,255,.95);border:.25rem dashed var(--v3);border-radius:1.6rem .6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;padding:.4rem;text-align:center;font-weight:900;font-size:1.25rem;min-height:0;overflow:hidden;cursor:pointer}
+.zone svg{flex:1;min-height:0;width:100%}
+.zone .got{display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center}
+.zone .got b{background:var(--v3);color:#fff;border-radius:.6rem;padding:.2rem .6rem;animation:pop .3s}
+.fig svg{height:min(30vh,15rem);width:auto;max-width:90vw;border-radius:1rem}
+.opt{font-size:1.5rem;max-width:26rem}
+.need{width:9rem;font-size:2rem;min-height:4.5rem}
+.need.pick{background:linear-gradient(#ff6fb0,#d81b6a);color:#fff;transform:scale(1.08)}
+#fb{position:absolute;left:50%;bottom:.7rem;transform:translateX(-50%);width:min(94%,60rem);border-radius:1.1rem;padding:.8rem 1.2rem;font-size:1.3rem;font-weight:900;text-align:center;color:#fff;z-index:20;pointer-events:none;box-shadow:0 .4rem 1rem rgba(0,0,0,.4);animation:pop .25s}
+#fb.good{background:#14a56f}#fb.bad{background:#b32b46}
+#learn,#modal{position:absolute;inset:0;background:rgba(5,5,40,.78);display:flex;align-items:center;justify-content:center;z-index:30;padding:1rem}
+#modal{position:fixed;z-index:60}
+#modal .card{max-height:94vh;overflow:auto;text-align:center;min-width:min(30rem,90vw)}
+table{border-collapse:collapse;width:100%;font-size:1.05rem}td,th{border-bottom:1px solid #bcd;padding:.35rem .7rem;text-align:left}
+.bigname{font-size:6rem;font-weight:900;color:var(--v3);line-height:1.1;word-break:break-word}
+.confetti{position:fixed;top:-2rem;width:.8rem;height:1.2rem;z-index:70;pointer-events:none;animation:conf 2.8s linear forwards}
+.node{cursor:pointer}.node.lock{cursor:default}
+.node:not(.lock) .nc{filter:drop-shadow(0 0 .6rem rgba(255,255,255,.95))}
+.stamps{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
+.stamp{display:flex;flex-direction:column;align-items:center;justify-content:center;width:6.8rem;height:6.8rem;border-radius:50%;font-size:2rem;border:.22rem double var(--v3);padding:.3rem;transform:rotate(-6deg);color:var(--v2);background:#f0eaff}
+.stamp:nth-child(even){transform:rotate(5deg);border-color:#d81b6a;color:#a81f50;background:#fff0f4}
+.stamp small{font-size:.62rem;font-weight:800;line-height:1.1}.stamp.off{opacity:.4;filter:grayscale(1)}
+.fxlayer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.fx{position:absolute;animation:fxpop 2s ease-in-out infinite}
+.trophy{font-size:5rem;filter:drop-shadow(0 0 2rem var(--cy))}
+.megacel{overflow-y:auto}
+.tabs{display:flex;gap:.5rem;justify-content:center}
+body.solo #bTeach{display:none}
+@media (orientation:portrait){html{font-size:3.6vw}.zones{grid-template-columns:repeat(2,1fr)!important}}
+@media (max-width:700px){#bar button{padding:.25rem .6rem}.lbl,#dots{display:none}#who{max-width:38vw}h1{font-size:2.3rem}.home h1{font-size:2.4rem}.bigname{font-size:3.2rem}.card{padding:.9rem 1rem}p{font-size:1.1rem}.big{font-size:1.35rem;padding:.7rem 1rem}.ask{font-size:1.1rem}.tile{font-size:1.1rem}}
+@media (max-height:520px) and (orientation:landscape){html{font-size:clamp(11px,3.7vh,16px)}.card{padding:.7rem 1.1rem}.screen{padding:.5rem;gap:.5rem}.home h1{font-size:2.2rem}.mascot{width:2.8rem}h1{font-size:2rem}.trophy{font-size:3rem}}
+</style>
+</head>
+<body>
+<div id="app"><div id="bar"></div><div id="view"></div>
+<div id="foot">&copy; 2026 Geometry Showdown | Developed by AMSanjeev (Teach For India Fellow 2026&ndash;28)</div></div>
+<script>
+'use strict';
+/* ================= CONFIG (same Firebase class database as RF Word Finder / Hydrosphere) ================= */
+const FB={project:'maths-penalty-cup',key:'AIzaSyAMsz-GB8WmGNUYjod6fquQJMYBQPJeOGs'};
+const fbUrl=c=>`https://firestore.googleapis.com/v1/projects/${FB.project}/databases/(default)/documents/classes/${c}?key=${FB.key}`;
+const fmtC=c=>c.slice(0,4)+'-'+c.slice(4);
+const RANKS=['Shape Rookie','Line Explorer','Angle Ace','Geometry Wizard','Geometry Hero'];
+const MISSIONS=[];
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const one=(...f)=>f[rnd(f.length)];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+let prefs=Object.assign({sound:true,music:true,full:false},store.get('gq_prefs',{}));
+const savePrefs=()=>store.set('gq_prefs',prefs);
+
+/* ================= AUDIO ================= */
+const Snd={ctx:null,amb:null,timer:null,
+ init(){try{if(!this.ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;this.ctx=new A()}if(this.ctx.state==='suspended')this.ctx.resume();this.music()}catch(e){}},
+ tone(f,d,t=0,v=.12,type='sine'){const c=this.ctx;if(!c)return;const o=c.createOscillator(),g=c.createGain(),s=c.currentTime+t;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(v,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g).connect(c.destination);o.start(s);o.stop(s+d+.05)},
+ play(n){if(!prefs.sound||!this.ctx)return;try{
+  if(n==='click')this.tone(520,.08,0,.08,'triangle');
+  if(n==='good'){this.tone(660,.14);this.tone(990,.2,.09)}
+  if(n==='bad'){this.tone(240,.22,0,.1,'triangle');this.tone(190,.28,.12,.1,'triangle')}
+  if(n==='zap'){this.tone(300,.1,0,.1,'square');this.tone(900,.18,.08,.08,'square')}
+  if(n==='badge')[523,659,784,1047].forEach((f,i)=>this.tone(f,.28,i*.11));
+  if(n==='party')[523,523,523,659,784,659,784,1047].forEach((f,i)=>this.tone(f,.25,i*.14,.14,'triangle'));
+ }catch(e){}},
+ music(){const c=this.ctx;if(!c)return;
+  if(prefs.music&&!this.timer){const N=[262,330,392,523,392,330,294,392,440,587,440,392];let i=0;this.timer=setInterval(()=>{if(document.hidden||!prefs.music)return;this.tone(N[i++%12],.9,0,.03,'sine');if(i%4===0)this.tone(N[i%12]/2,1.2,0,.025,'triangle')},650)}
+  if(!prefs.music&&this.timer){clearInterval(this.timer);this.timer=null}}
+};
+addEventListener('pointerdown',()=>Snd.init(),{once:true});
+document.addEventListener('click',e=>{if(e.target.closest('button'))Snd.play('click')});
+
+/* ================= CLASS LOADER (same logic as Hydrosphere / Maths Champion) ================= */
+const CC={code:'',lib:null,cls:'',msg:'',busy:false,tab:'auto',manual:store.get('gq_manual','')};
+try{CC.code=localStorage.getItem('pk_code')||''}catch(e){}
+async function loadCode(c){
+ c=(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+ if(c.length!=8){CC.msg='A class code has 8 letters and numbers.';return showSetup()}
+ CC.busy=true;CC.msg='Loading...';showSetup();
+ try{
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),15000);
+  const r=await fetch(fbUrl(c),{signal:ctl.signal});clearTimeout(to);
+  if(!r.ok){CC.msg=r.status==404?'Code not found. Check it and try again.':'Could not load (error '+r.status+').'}
+  else{
+   let lib=null;try{const j=await r.json();lib=JSON.parse(j.fields.lib.stringValue)}catch(e){}
+   if(!lib||typeof lib!=='object'||Array.isArray(lib))CC.msg='This code has data the game cannot read. Open your class list and save it again.';
+   else{CC.lib=lib;CC.code=c;try{localStorage.setItem('pk_code',c)}catch(e){}
+    const ks=Object.keys(lib);CC.cls=ks.length==1?ks[0]:(Object.prototype.hasOwnProperty.call(lib,CC.cls)?CC.cls:'');CC.msg=ks.length?'':'That code has no classes yet.'}
+  }
+ }catch(e){CC.msg='Could not reach the cloud. Check the internet and try again.'}
+ CC.busy=false;showSetup();
+}
+function readClass(k){
+ const c=CC.lib&&CC.lib[k],list=[],seen=new Set(),repeats=[];
+ if(c&&Array.isArray(c.g))c.g.slice(0,c.n).forEach(g=>String((g&&g.txt)||'').split('\n').map(x=>x.trim()).filter(Boolean).forEach(n=>{if(!seen.has(n)){seen.add(n);list.push({n,team:g.name})}else repeats.push(n)}));
+ return{list,repeats};
+}
+
+/* ================= STATE ================= */
+/* G.mode: 'solo' | 'class' | 'preview'.  G.t is the current explorer's turn object. */
+let SO=store.get('gq_solo',null),SES=store.get('gq_session',null),G={mode:'',t:null},M=null,epoch=0,inPlay=false,picked=null,fbTimer;
+if(SES&&!(Array.isArray(SES.names)&&Array.isArray(SES.done)&&Array.isArray(SES.skip)&&SES.adv))SES=null;
+if(SO&&!(SO.name&&Array.isArray(SO.mdone)))SO=null;
+const newTurn=(name,m=0)=>({name,m,mission:m,done:false,pts:0,gems:0,right:0,total:0,badges:[]});
+const remaining=()=>SES?SES.names.filter(n=>!SES.done.includes(n)&&!SES.skip.includes(n)):[];
+const cur=()=>G.t;
+const isSolo=()=>G.mode==='solo';
+function save(){if(G.mode==='solo')store.set('gq_solo',SO);else if(G.mode==='class')store.set('gq_session',SES)}
+const later=(fn,ms)=>{const e=epoch;setTimeout(()=>{if(e===epoch)fn()},ms)};
+function view(html,play=false){epoch++;inPlay=play;closeModal();$$('.ghost').forEach(g=>g.remove());$('#view').innerHTML=html;drawBar()}
+function modal(html){closeModal();const d=document.createElement('div');d.id='modal';d.innerHTML=`<div class="card col">${html}</div>`;document.body.appendChild(d)}
+function closeModal(){const m=$('#modal');if(m)m.remove()}
+function ask2(msg,yes,fn){modal(`<h2>${msg}</h2><div class="row"><button class="danger" id="yes">${yes}</button><button id="no">Cancel</button></div>`);$('#yes').onclick=()=>{closeModal();fn()};$('#no').onclick=openTeacher}
+function confetti(){for(let i=0;i<70;i++){const c=document.createElement('i');c.className='confetti';c.style.cssText=`left:${rnd(100)}vw;background:${['#38e8ff','#ff4f9a','#ffd23f','#fff','#2ee6a6'][i%5]};animation-delay:${Math.random()*.9}s`;document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}}
+const rankOf=t=>{if(!t.total)return RANKS[0];const r=t.right/t.total;return RANKS[r<.4?1:r<.6?2:r<.8?3:4]};
+const stamped=(t,i)=>isSolo()?SO.mdone.includes(i):i<t.m;
+const stampCount=t=>MISSIONS.filter((_,i)=>stamped(t,i)).length;
+
+/* ================= TOP BAR ================= */
+function drawBar(){
+ document.body.classList.toggle('solo',G.mode==='solo');
+ const t=inPlay?cur():null;
+ let h=`<button id="bBack">${inPlay?'&#11013; Map':'&#127968; Menu'}</button>`;
+ if(t)h+=`<span id="who">&#129517; ${esc(t.name)}</span><div id="dots">${MISSIONS.map((m,i)=>`<i class="${stamped(t,i)?'d':i===t.m?'c':''}">${i+1}</i>`).join('')}</div><span class="stat" id="sGem">&#128142; ${t.gems}</span><span class="stat" id="sPts">&#11088; ${t.pts}</span><button id="bPass">&#128706; ${stampCount(t)}/${MISSIONS.length}</button>`;
+ else h+='<span style="margin-right:auto;font-weight:900">Geometry Showdown &ndash; The Shape Rescue</span>';
+ h+=`<button id="bSnd">${prefs.sound?'&#128266;':'&#128263;'}<span class="lbl"> Sound</span></button><button id="bMus">${prefs.music?'&#127925;':'&#128683;'}<span class="lbl"> Music</span></button><button id="bFull">&#9974;</button><button id="bTeach" title="Teacher menu (hold)">&#9881;&#65039;</button>`;
+ $('#bar').innerHTML=h;
+ if($('#bPass'))$('#bPass').onclick=showPassport;
+ $('#bBack').onclick=()=>{if(!inPlay)return showHome();if($('.mapsvg'))modal(`<h2>Leave this turn?</h2><p>Progress is saved. You can resume later.</p><div class="row"><button class="danger" id="lv">Go to menu</button><button id="st">Keep playing</button></div>`),$('#lv').onclick=showHome,$('#st').onclick=closeModal;else showMap()};
+ $('#bSnd').onclick=()=>{prefs.sound=!prefs.sound;savePrefs();drawBar()};
+ $('#bMus').onclick=()=>{prefs.music=!prefs.music;savePrefs();Snd.init();Snd.music();drawBar()};
+ $('#bFull').onclick=()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}};
+ const tb=$('#bTeach');let hold;
+ tb.onpointerdown=()=>{tb.textContent='\u23F3';hold=setTimeout(()=>{tb.innerHTML='&#9881;&#65039;';openTeacher()},800)};
+ tb.onpointerup=tb.onpointerleave=tb.onpointercancel=()=>{clearTimeout(hold);tb.innerHTML='&#9881;&#65039;'};
+ tb.onkeydown=e=>{if(e.key==='Enter')openTeacher()};
+}
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('touchmove',e=>{if(!e.target.closest('.screen,#modal .card'))e.preventDefault()},{passive:false});
+setInterval(()=>{const t=inPlay&&cur();if(!t)return;const g=$('#sGem'),p=$('#sPts');if(g)g.innerHTML='&#128142; '+t.gems;if(p)p.innerHTML='&#11088; '+t.pts;if(G.mode!=='preview')save()},600);
+
+/* ================= FIGURES (SVG) ================= */
+const INK='#1b2a6b',PINK='#e0306e',CY='#0aa3c2',GOLD='#f5b301';
+const S2=(vb,inner)=>`<svg viewBox="${vb}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+const PANEL=(w,h)=>`<rect width="${w}" height="${h}" rx="14" fill="#f4f7ff"/>`;
+const T=(x,y,s,fs=20)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="${INK}">${s}</text>`;
+const ah=(x,y,deg,c=INK,s=11)=>{const a=deg*Math.PI/180,p=d=>`${x-s*Math.cos(a+d)},${y+s*Math.sin(a+d)}`;return `<polygon points="${x},${y} ${p(.4)} ${p(-.4)}" fill="${c}"/>`};
+const ln=(x1,y1,x2,y2,c=INK,w=4)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+const dt=(x,y,c=INK,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`;
+function sierBody(x,y,size,dep,fill){if(dep===0){const h=size*Math.sqrt(3)/2;return `<polygon points="${x},${y} ${x+size},${y} ${x+size/2},${y-h}" fill="${fill}" stroke="${INK}" stroke-width="1"/>`}const s=size/2,h=size*Math.sqrt(3)/4;return sierBody(x,y,s,dep-1,fill)+sierBody(x+s,y,s,dep-1,fill)+sierBody(x+s/2,y-h,s,dep-1,fill)}
+function treeBody(x,y,len,ang,d){if(!d)return'';const x2=x+len*Math.cos(ang),y2=y-len*Math.sin(ang);return ln(x,y,x2,y2,d>2?'#7a4a20':'#1ea35a',d*1.2)+treeBody(x2,y2,len*.72,ang+.5,d-1)+treeBody(x2,y2,len*.72,ang-.5,d-1)}
+const pic={
+ point:()=>S2('0 0 200 110',PANEL(200,110)+dt(100,48,INK,8)+T(100,90,'A',24)),
+ line:()=>S2('0 0 200 110',PANEL(200,110)+ln(18,50,182,50)+ah(186,50,0)+ah(14,50,180)+dt(70,50)+dt(130,50)+T(70,86,'P',22)+T(130,86,'Q',22)),
+ seg:()=>S2('0 0 200 110',PANEL(200,110)+ln(34,50,166,50)+dt(34,50,INK,8)+dt(166,50,INK,8)+T(34,86,'M',22)+T(166,86,'N',22)),
+ ray:()=>S2('0 0 200 110',PANEL(200,110)+ln(32,50,180,50)+ah(186,50,0)+dt(32,50,INK,8)+dt(110,50)+T(32,86,'R',22)+T(110,86,'S',22)),
+ ang:deg=>{const vx=deg<=90?50:110,vy=108,L=90,ex=vx+L*Math.cos(deg*Math.PI/180),ey=vy-L*Math.sin(deg*Math.PI/180);
+  let a=ln(vx,vy,vx+L,vy)+ah(vx+L+4,vy,0)+ln(vx,vy,ex,ey,PINK)+ah(ex+4*Math.cos(deg*Math.PI/180),ey-4*Math.sin(deg*Math.PI/180),deg,PINK)+dt(vx,vy,INK,6);
+  if(deg===90)a+=`<path d="M${vx+16} ${vy} V${vy-16} H${vx}" fill="none" stroke="${INK}" stroke-width="3"/>`;
+  else{const r=24,r1=deg*Math.PI/180;a+=`<path d="M${vx+r} ${vy} A${r} ${r} 0 0 0 ${vx+r*Math.cos(r1)} ${vy-r*Math.sin(r1)}" fill="none" stroke="${INK}" stroke-width="3"/>`}
+  return S2('0 0 220 130',PANEL(220,130)+a)},
+ sier:(n,lab)=>S2('0 0 200 150',PANEL(200,150)+sierBody(30,124,140,n,'#ff6fb0')+(lab?T(100,144,lab,15):'')),
+ tree:()=>S2('0 0 200 130',PANEL(200,130)+treeBody(100,122,30,Math.PI/2,6)),
+ sq:()=>S2('0 0 200 130',PANEL(200,130)+`<rect x="60" y="25" width="80" height="80" fill="#9ad8ff" stroke="${INK}" stroke-width="3"/>`),
+ circ:()=>S2('0 0 200 130',PANEL(200,130)+`<circle cx="100" cy="65" r="42" fill="#ffe27a" stroke="${INK}" stroke-width="3"/>`)
+};
+
+/* ================= HOME ================= */
+function galaxy(){
+ let h='<div class="scene" aria-hidden="true">';
+ for(let i=0;i<70;i++){const s=1+Math.random()*3;h+=`<i class="star" style="left:${rnd(100)}%;top:${rnd(100)}%;width:${s}px;height:${s}px;animation-delay:-${rnd(30)/10}s;animation-duration:${2+rnd(30)/10}s"></i>`}
+ h+='<div class="planet" style="right:7%;top:9%;width:7rem;height:7rem"></div><div class="ring" style="right:4%;top:14%;width:13rem;height:13rem;border-width:.4rem"></div>';
+ const col=['#38e8ff','#ff4f9a','#ffd23f','#2ee6a6','#ffffff'],S=[
+  c=>`<polygon points="50,10 92,88 8,88" fill="none" stroke="${c}" stroke-width="5"/>`,
+  c=>`<rect x="15" y="15" width="70" height="70" fill="none" stroke="${c}" stroke-width="5"/>`,
+  c=>`<circle cx="50" cy="50" r="38" fill="none" stroke="${c}" stroke-width="5"/>`,
+  c=>`<polygon points="50,8 92,40 76,90 24,90 8,40" fill="none" stroke="${c}" stroke-width="5"/>`,
+  c=>`<path d="M10 88H90M10 88L70 20" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/><path d="M40 88A30 30 0 0 0 31 67" fill="none" stroke="${c}" stroke-width="4"/>`,
+  c=>`<path d="M10 50H84" stroke="${c}" stroke-width="5" stroke-linecap="round"/><polygon points="94,50 78,42 78,58" fill="${c}"/><circle cx="10" cy="50" r="6" fill="${c}"/>`];
+ for(let i=0;i<16;i++){const c=col[i%5],sz=3+rnd(40)/10;h+=`<svg class="shape" viewBox="0 0 100 100" style="left:${rnd(94)}%;top:${rnd(86)}%;width:${sz}rem;color:${c};animation-duration:${10+rnd(14)}s;animation-delay:-${rnd(20)}s">${S[i%6](c)}</svg>`}
+ for(let i=0;i<3;i++)h+=`<i class="shoot" style="right:${rnd(40)}%;top:${rnd(40)}%;animation-delay:${i*2.3}s"></i>`;
+ let ticks='';for(let a=0;a<=180;a+=5){const r=a*Math.PI/180,l=a%30===0?30:a%10===0?20:12;ticks+=`<line x1="${250+235*Math.cos(r)}" y1="${250-235*Math.sin(r)}" x2="${250+(235-l)*Math.cos(r)}" y2="${250-(235-l)*Math.sin(r)}" stroke="#38e8ff" stroke-width="2"/>`}
+ h+=`<svg class="proto" viewBox="0 0 500 500"><path d="M15 250A235 235 0 0 1 485 250Z" fill="none" stroke="#38e8ff" stroke-width="3"/>${ticks}</svg>`;
+ return h+'</div>';
+}
+const waveText=(s,st=0)=>[...s].map((c,i)=>c===' '?' ':`<span style="animation-delay:${(i+st)*.09}s">${c}</span>`).join('');
+const MASCOT=`<svg viewBox="0 0 100 100" class="bob mascot" aria-hidden="true"><defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs><polygon points="50,6 94,88 6,88" fill="url(#mg)" stroke="#fff" stroke-width="4" stroke-linejoin="round"/><circle cx="38" cy="62" r="5" fill="#0b1033"/><circle cx="62" cy="62" r="5" fill="#0b1033"/><path d="M38 74q12 10 24 0" stroke="#0b1033" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M30 82A22 22 0 0 0 38 70" stroke="#fff" stroke-width="2" fill="none" opacity=".0"/></svg>`;
+function showHome(){
+ G={mode:'',t:null};
+ const okS=!!(SO&&SO.name);
+ let h=`${galaxy()}<div class="screen home"><div class="card col">${MASCOT}<h1 class="title" aria-label="Geometry Showdown">${waveText('GEOMETRY')}<br>${waveText('SHOWDOWN',8)}<span class="sub">THE SHAPE RESCUE</span></h1><p>Lines, angles and fractals. Save the Shape Kingdom!</p><div class="col wide">`;
+ if(okS)h+=`<button class="primary big" id="rsolo">${SO.finished?'&#127942; Play again':'&#9654; Continue'} &ndash; ${esc(SO.name)} (&#11088; ${SO.pts})</button>`;
+ h+=`<button class="${okS?'':'primary'} big" id="solo">&#129335; ${okS?'New solo explorer':'PLAY SOLO'}</button>`;
+ if(SES&&SES.current)h+=`<button class="big gold" id="res">&#127979; Resume ${esc(SES.current.name)}'s class turn</button>`;
+ else if(SES)h+=`<button class="big gold" id="res">&#127979; Continue ${esc(SES.cls)} (${remaining().length} left)</button>`;
+ h+=`</div><p class="small">Playing at home? Tap PLAY SOLO and type your name. Teachers: hold &#9881;&#65039; at the top right.</p></div></div>`;
+ view(h);
+ $('#solo').onclick=()=>okS?(modal(`<h2>Start a new explorer?</h2><p>This will replace ${esc(SO.name)}'s saved adventure on this device.</p><div class="row"><button class="danger" id="yn">Yes, new explorer</button><button id="nn">Keep ${esc(SO.name)}</button></div>`),$('#yn').onclick=()=>{closeModal();showSolo()},$('#nn').onclick=closeModal):showSolo();
+ if($('#rsolo'))$('#rsolo').onclick=soloResume;
+ if($('#res'))$('#res').onclick=()=>{G={mode:'class',t:SES.current};SES.current?showMap():selectPlayer()};
+}
+function showSolo(){
+ view(`${galaxy()}<div class="screen home"><div class="card col">${MASCOT}<h2>What is your name, Explorer?</h2><input class="txt" id="sname" aria-label="Your name" maxlength="20" placeholder="Type your name" autocomplete="off" value="${esc(store.get('gq_name',''))}"><button class="primary big" id="sgo">&#128640; Start the Rescue</button><button id="sback">&#11013; Back</button></div></div>`);
+ const go=()=>{const n=$('#sname').value.replace(/\s+/g,' ').trim().slice(0,20);if(!n){$('#sname').focus();return}store.set('gq_name',n);SO={name:n,m:0,mission:0,done:false,pts:0,gems:0,right:0,total:0,badges:[],mdone:[],finished:false,free:false};G={mode:'solo',t:SO};save();showMap()};
+ $('#sgo').onclick=go;$('#sname').onkeydown=e=>{if(e.key==='Enter')go()};$('#sback').onclick=showHome;
+}
+function soloResume(){
+ G={mode:'solo',t:SO};SO.free=!!SO.free;
+ if(SO.finished){modal(`<h2>Welcome back, ${esc(SO.name)}!</h2><p>You rescued the whole kingdom. Resume or restart?</p><div class="row"><button class="primary" id="resm">&#9654; Resume (play any mission, keep points)</button><button class="danger" id="rest">&#128260; Restart from the beginning</button></div>`);
+  $('#resm').onclick=()=>{closeModal();SO.free=true;save();showMap()};
+  $('#rest').onclick=()=>{closeModal();SO={name:SO.name,m:0,mission:0,done:false,pts:0,gems:0,right:0,total:0,badges:[],mdone:[],finished:false,free:false};G={mode:'solo',t:SO};save();showMap()};return}
+ showMap();
+}
+function showPassport(){
+ const t=cur();if(!t)return;const acc=t.total?Math.round(100*t.right/t.total):0;
+ modal(`<h2>&#128706; ${esc(t.name)}'s Shape Passport</h2><div class="stamps">${MISSIONS.map((m,i)=>stamped(t,i)?`<span class="stamp">${m.icon}<small>${m.short}</small></span>`:`<span class="stamp off">&#11036;<small>${m.short}</small></span>`).join('')}</div><div class="row"><span class="badge">&#11088; ${t.pts} points</span><span class="badge">&#128142; ${t.gems} gems</span><span class="badge">&#127919; ${acc}% right first time</span><span class="badge">&#127894;&#65039; ${rankOf(t)}</span></div><div class="row">${t.badges.map(b=>`<span class="badge" style="background:var(--gold)">${b}</span>`).join('')||'<span>Keep exploring to earn badges!</span>'}</div><button class="primary" id="pc">Close</button>`);
+ $('#pc').onclick=closeModal;
+}
+
+/* ================= MAP ================= */
+const isTall=()=>typeof matchMedia==='function'&&matchMedia('(orientation:portrait) and (max-width:700px)').matches;
+addEventListener('resize',()=>{if($('.mapsvg')&&!$('#modal'))showMap()});
+function showMap(){
+ const t=cur();if(!t)return showHome();
+ const FR=(isSolo()&&SO.free)||G.mode==='preview',tall=isTall(),n=MISSIONS.length;
+ const P=tall?MISSIONS.map((_,i)=>[i%2?390:110,70+i*118]):[[100,365],[250,185],[410,365],[570,185],[730,365],[890,150]];
+ const W=tall?500:1000,H=tall?760:500;
+ let s=`<svg class="mapsvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="pg" x1="0" x2="1"><stop offset="0" stop-color="#38e8ff"/><stop offset="1" stop-color="#ff4f9a"/></linearGradient></defs>
+ <rect x="6" y="6" width="${W-12}" height="${H-12}" rx="40" fill="rgba(255,255,255,.07)" stroke="rgba(56,232,255,.5)" stroke-width="3" stroke-dasharray="10 10"/>
+ <text x="${W/2}" y="48" text-anchor="middle" font-size="36" font-weight="900" fill="#fff">The Shape Kingdom</text>
+ <path d="M${P.map(p=>p.join(' ')).join(' L')}" fill="none" stroke="url(#pg)" stroke-width="9" class="flow" stroke-linecap="round"/>`;
+ MISSIONS.forEach((m,i)=>{const[x,y]=P[i],st=FR?(i===t.m&&!isSolo()?'open':'free'):(i<t.m?'done':i===t.m?'open':'lock'),fin=i===n-1;
+  const can=st!=='lock',fill=st==='done'?'#2ee6a6':st==='open'?'#ff4f9a':st==='free'?'#ffd23f':'#8a86b8';
+  s+=`<g class="node ${can?'':'lock'}" data-i="${i}" role="button" aria-label="${esc(m.name)}"><g class="${st==='open'?'bob':''} nc"><circle cx="${x}" cy="${y}" r="${st==='open'?56:46}" fill="${fill}" stroke="#fff" stroke-width="6"/><text x="${x}" y="${y+17}" text-anchor="middle" font-size="46">${can?m.icon:'&#128274;'}</text></g><rect x="${x-78}" y="${y+60}" width="156" height="50" rx="14" fill="${st==='lock'?'#cfcbe8':'#fff'}"/><text x="${x}" y="${y+80}" text-anchor="middle" font-size="15" font-weight="800" fill="#6a2cb8">${fin?'Final Test':'Mission '+(i+1)}${st==='done'?' &#10004;':''}</text><text x="${x}" y="${y+100}" text-anchor="middle" font-size="${m.short.length>14?13:15}" font-weight="800" fill="#0b1033">${m.short}</text></g>`});
+ const ci=Math.min(t.m,n-1);if(!FR||!isSolo())s+=`<g pointer-events="none" class="bob"><polygon points="${P[ci][0]+56},${P[ci][1]-70} ${P[ci][0]+40},${P[ci][1]-40} ${P[ci][0]+72},${P[ci][1]-40}" fill="#ffd23f" stroke="#fff" stroke-width="3"/></g>`;
+ s+='</svg>';
+ view(`<div class="act"><div class="ask">${esc(t.name)}, ${FR&&isSolo()?'tap any place to play it again!':'tap the glowing place to start '+(t.m>=n-1?'the Final Test':'Mission '+(t.m+1))+'!'}</div><div class="stage">${s}</div></div>`,true);
+ $$('.node').forEach(g=>g.onclick=()=>{const i=+g.dataset.i;if(i===t.m||FR){Snd.play('zap');intro(i)}});
+}
+
+/* ================= MISSION FLOW ================= */
+function snapshot(t){if(t.base)Object.assign(t,t.base);t.base={pts:t.pts,right:t.right,total:t.total}}
+function intro(i){
+ const m=MISSIONS[i],t=cur();if(G.mode==='preview'){t.m=t.mission=i;t.done=false}
+ view(`<div class="screen" style="background:${m.bg}">${galaxy()}<div class="card col"><div style="font-size:5rem" class="bob">${m.icon}</div><h3>${i===MISSIONS.length-1?'Final Test':'Mission '+(i+1)}</h3><h2>${m.name}</h2><p>${m.story}</p><p><b>How to play:</b> ${m.how}</p><button class="primary" id="go">Let's go!</button></div></div>`,true);
+ $('#go').onclick=()=>{snapshot(t);M={i,def:m,step:0,mist:0,steps:m.steps(G.mode==='class'?prefs.full:true)};runStep()};
+}
+function runStep(){
+ view(`<div class="act" style="background:${M.def.bg}"><div class="ask" id="ask"></div><div class="stage" id="stage"></div><div class="tray" id="tray"></div></div>`,true);
+ let finished=false;
+ M.steps[M.step]({ask:h=>$('#ask').innerHTML=h,stage:$('#stage'),tray:$('#tray'),done:learn=>{if(finished)return;finished=true;later(()=>learnCard(learn),900)}});
+}
+function learnCard(text){
+ const d=document.createElement('div');d.id='learn';d.innerHTML=`<div class="card col"><h2>&#128161; What we learnt</h2><p>${text}</p><button class="primary" id="nx">Continue</button></div>`;
+ $('#view').appendChild(d);$('#fb')&&$('#fb').remove();Snd.play('good');
+ $('#nx').onclick=()=>{M.step++;M.step<M.steps.length?runStep():completeMission()};
+}
+function feedback(ok,msg){
+ let f=$('#fb');if(f)f.remove();f=document.createElement('div');f.id='fb';f.className=ok?'good':'bad';f.setAttribute('role','status');f.innerHTML=msg;$('#view').appendChild(f);
+ clearTimeout(fbTimer);fbTimer=setTimeout(()=>f.remove(),ok?2600:5200);
+}
+function good(msg,missed){const t=cur(),p=!missed?20:missed>1?3:8;t.total++;if(!missed)t.right++;t.pts+=p;Snd.play('good');feedback(true,'&#10004; +'+p+' points! '+(msg||''));drawBar()}
+function bad(msg){if(M)M.mist++;Snd.play('bad');feedback(false,'Good try! '+msg)}
+const award=b=>{const t=cur();if(!t.badges.includes(b))t.badges.push(b)};
+function completeMission(){
+ const t=cur(),m=M.def,i=M.i,last=i===MISSIONS.length-1,g=M.mist===0?3:M.mist<=2?2:1;
+ t.gems+=g;t.pts+=50;award(m.badge);if(!M.mist)award('\u2728 Sharp Eyes');delete t.base;
+ if(isSolo()){const first=!SO.mdone.includes(i);if(first)SO.mdone.push(i);if(!SO.free)t.m=Math.max(t.m,i+1);
+  if(last){const f=!SO.finished;SO.finished=true;t.m=MISSIONS.length;save();return f?soloCelebration():stampScreen(m,g,true)}
+  save();return stampScreen(m,g,false)}
+ t.m=i+1;t.done=true;
+ if(G.mode==='class'){SES.adv=last?{m:0,round:SES.adv.round+1}:{m:t.m,round:SES.adv.round};save()}
+ finishTurn();
+}
+function stampScreen(m,g,last){const t=cur();
+ view(`<div class="screen" style="background:${m.bg}">${galaxy()}<div class="card col"><h2>${m.icon} ${last?'Test passed!':'Stamp collected!'}</h2><div style="font-size:4.5rem" class="bob">${'&#128142;'.repeat(g)}</div><p><b>${esc(t.name)}</b> won ${g} Gem${g>1?'s':''} and 50 bonus points.</p><span class="badge">New badge: ${m.badge}</span><div class="row"><span class="badge">&#11088; ${t.pts} points</span><span class="badge">&#128142; ${t.gems} gems</span><span class="badge">&#128706; ${stampCount(t)} of ${MISSIONS.length} stamps</span></div><button class="primary" id="go">Back to the map</button></div></div>`);
+ Snd.play('badge');confetti();$('#go').onclick=showMap;
+}
+function soloCelebration(){
+ const t=cur(),acc=t.total?Math.round(100*t.right/t.total):0;
+ const fw=Array.from({length:28},(_,i)=>`<i class="fx" style="left:${rnd(94)}%;top:${rnd(80)}%;animation-delay:-${rnd(20)/10}s;font-size:${2+rnd(4)}rem">${['&#127878;','&#128208;','&#10024;','&#128207;','&#127775;','&#127752;'][i%6]}</i>`).join('');
+ view(`<div class="screen megacel">${galaxy()}<div class="fxlayer">${fw}</div><div class="card col" style="position:relative;z-index:2"><div class="trophy bob">&#127942;</div><h1 class="title">GEOMETRY HERO!</h1><h2>${esc(t.name)}</h2><p>You finished every mission and saved the Shape Kingdom!</p><div class="stamps">${MISSIONS.map(m=>`<span class="stamp">${m.icon}<small>${m.short}</small></span>`).join('')}</div><div class="row"><span class="badge">&#11088; ${t.pts} points</span><span class="badge">&#128142; ${t.gems} gems</span><span class="badge">&#127919; ${acc}% right first time</span><span class="badge">&#127894;&#65039; ${rankOf(t)}</span></div><div class="row"><button class="primary big" id="ag">&#128506;&#65039; Explore again</button><button id="mn">&#127968; Menu</button></div></div></div>`);
+ Snd.play('party');confetti();[400,1100,1800,2600,3500].forEach(d=>later(()=>{confetti();Snd.play('party')},d));
+ $('#ag').onclick=()=>{SO.free=true;save();showMap()};$('#mn').onclick=showHome;
+}
+
+/* ================= CLASS MODE (hidden behind the teacher gear) ================= */
+function showSetup(){
+ let h=`<div class="screen">${galaxy()}<div class="card col" style="width:min(56rem,96%)"><h2>Teacher setup: Class mode</h2><div class="tabs"><button id="tAuto" class="${CC.tab==='auto'?'on':''}">Auto (class code)</button><button id="tMan" class="${CC.tab==='manual'?'on':''}">Manual (type names)</button></div>`;
+ let list=[],clsName='';
+ if(CC.tab==='auto'){
+  if(!CC.lib)h+=`<p>Enter your class code (the same one you use in your other games).</p><div class="row"><input id="code" aria-label="Class code" placeholder="XXXX-XXXX" maxlength="11" autocomplete="off" value="${esc(CC.code?fmtC(CC.code):'')}"><button class="primary" id="load" ${CC.busy?'disabled':''}>Load class</button></div>`;
+  else{const ks=Object.keys(CC.lib);h+=`<p>Class code <b>${esc(fmtC(CC.code))}</b>. Choose your class.</p><div class="row">${ks.map((k,i)=>`<button class="cls ${k===CC.cls?'on':''}" data-i="${i}">${esc(k)}</button>`).join('')}<button id="chg">Change code</button></div>`;
+   if(CC.cls){const r=readClass(CC.cls);list=r.list.map(p=>p.n);clsName=CC.cls;h+=`<h3>${list.length} students loaded</h3>`;if(!list.length)h+='<p class="err">This class has no student names.</p>';if(r.repeats.length)h+=`<p class="small err">Repeated name(s) counted once: ${esc([...new Set(r.repeats)].join(', '))}.</p>`}}
+ }else{
+  h+=`<p>Type one student name per line.</p><textarea class="txt" id="mtxt" placeholder="Asha&#10;Ravi&#10;Meena">${esc(CC.manual)}</textarea>`;
+  list=[...new Set(CC.manual.split('\n').map(x=>x.trim()).filter(Boolean))];clsName='Manual class';h+=`<h3 id="mcnt">${list.length} students</h3>`;
+ }
+ h+=`<div class="row"><span>Each student plays one mission:</span><button id="std" class="${prefs.full?'':'on'}">Short mission</button><button id="ful" class="${prefs.full?'on':''}">Full mission</button></div><button class="primary" id="go" ${list.length?'':'disabled'}>START CLASS</button>`;
+ if(CC.msg&&CC.tab==='auto')h+=`<p class="${CC.busy?'':'err'}" role="status">${esc(CC.msg)}</p>`;
+ h+=`<div class="row"><button id="prev">Preview missions (no class)</button><button id="home">Main menu</button></div></div></div>`;
+ view(h);
+ $('#tAuto').onclick=()=>{CC.tab='auto';showSetup()};$('#tMan').onclick=()=>{CC.tab='manual';showSetup()};
+ if($('#load')){$('#load').onclick=()=>loadCode($('#code').value);$('#code').onkeydown=e=>{if(e.key==='Enter')loadCode(e.target.value)}}
+ $$('.cls').forEach(b=>b.onclick=()=>{CC.cls=Object.keys(CC.lib)[+b.dataset.i];showSetup()});
+ if($('#chg'))$('#chg').onclick=()=>{CC.lib=null;CC.cls='';CC.msg='';showSetup()};
+ if($('#mtxt'))$('#mtxt').oninput=e=>{CC.manual=e.target.value;store.set('gq_manual',CC.manual);const n=[...new Set(CC.manual.split('\n').map(x=>x.trim()).filter(Boolean))].length;$('#mcnt').textContent=n+' students';$('#go').disabled=!n};
+ $('#std').onclick=()=>{prefs.full=false;savePrefs();showSetup()};$('#ful').onclick=()=>{prefs.full=true;savePrefs();showSetup()};
+ $('#go').onclick=()=>startClass(CC.tab==='auto'?readClass(CC.cls).list.map(p=>p.n):[...new Set(CC.manual.split('\n').map(x=>x.trim()).filter(Boolean))],CC.tab==='auto'?CC.cls:'Manual class',CC.tab==='auto'?CC.code:'');
+ $('#prev').onclick=()=>{G={mode:'preview',t:newTurn('Teacher Preview')};showMap()};
+ $('#home').onclick=showHome;
+}
+function startClass(names,cls,code){
+ if(!names.length)return;
+ const begin=()=>{SES={code,cls,names,done:[],skip:[],current:null,results:[],adv:{m:0,round:1}};G={mode:'class',t:null};save();selectPlayer()};
+ if(SES&&SES.cls===cls&&SES.code===code&&(SES.done.length||SES.skip.length||SES.current)){
+  modal(`<h2>This class already has a session</h2><p>${SES.done.length} played, ${SES.skip.length} skipped.</p><div class="row"><button class="primary" id="keep">Continue it</button><button class="danger" id="fresh">Start fresh</button></div>`);
+  $('#keep').onclick=()=>{SES.names=names;SES.done=SES.done.filter(n=>names.includes(n));SES.skip=SES.skip.filter(n=>names.includes(n));if(SES.current&&!names.includes(SES.current.name))SES.current=null;G={mode:'class',t:SES.current};save();SES.current?showMap():selectPlayer()};
+  $('#fresh').onclick=begin;
+ }else if(SES&&(SES.done.length||SES.current)){
+  modal(`<h2>Replace the ${esc(SES.cls)} session?</h2><p>Its turn list will be cleared.</p><div class="row"><button class="danger" id="fresh">Start ${esc(cls)}</button><button id="no">Cancel</button></div>`);$('#fresh').onclick=begin;$('#no').onclick=closeModal;
+ }else begin();
+}
+const missionName=i=>i>=MISSIONS.length-1?'the Final Test':`Mission ${i+1}: ${MISSIONS[i].name}`;
+function selectPlayer(){
+ if(!SES)return showSetup();
+ G={mode:'class',t:SES.current};
+ if(SES.current)return revealPlayer(SES.current.name);
+ const rem=remaining();if(!rem.length)return showCelebration();
+ const pick=rem[rnd(rem.length)];SES.current=newTurn(pick,SES.adv.m);G.t=SES.current;save();
+ view(`<div class="screen">${galaxy()}<div class="card col" style="min-width:60%"><h2>&#11088; Who will play ${esc(missionName(SES.adv.m))}? &#11088;</h2><div class="bigname" id="spin" aria-live="polite">...</div></div></div>`);
+ let i=0,d=60;const step=()=>{if(i++<20){$('#spin').textContent=rem.length>1?rem[rnd(rem.length)]:pick;Snd.play('click');d*=1.09;later(step,d)}else revealPlayer(pick)};step();
+}
+function revealPlayer(name){
+ view(`<div class="screen">${galaxy()}<div class="card col" style="min-width:60%"><h2>Shape Explorer</h2><div class="bigname">${esc(name)}</div><h3 style="color:var(--v3)">${esc(missionName(SES.current.m))}</h3><p>Come to the board. The kingdom needs you!</p><div class="row"><button class="primary" id="go">&#9654; Start mission</button><button id="skip">Skip (absent)</button></div><p class="small">${Math.max(0,remaining().length-1)} more explorer(s) waiting</p></div></div>`);
+ Snd.play('badge');$('#go').onclick=showMap;$('#skip').onclick=skipCurrent;
+}
+function skipCurrent(){if(!SES||!SES.current)return;SES.skip.push(SES.current.name);SES.current=null;save();selectPlayer()}
+function finishTurn(){
+ const t=cur();if(!t)return showHome();
+ const quiz=t.mission>=MISSIONS.length-1,rank=rankOf(t),what=MISSIONS[Math.min(t.mission,MISSIONS.length-1)].short;
+ const res={n:t.name,mission:what,done:t.done,pts:t.pts,gems:t.gems,right:t.right,total:t.total,rank,badges:t.badges};
+ const prev=G.mode==='preview';
+ if(!prev){SES.results.push(res);if(!SES.done.includes(t.name))SES.done.push(t.name);SES.current=null;save();
+  const h=store.get('gq_hist',[]),d=new Date();h.push({d:d.toLocaleDateString('en-GB'),t:d.toTimeString().slice(0,5),cls:SES.cls,...res,badges:res.badges.length});store.set('gq_hist',h.slice(-2000))}
+ const left=prev?0:remaining().length;
+ view(`<div class="screen">${galaxy()}<div class="card col"><h2>&#127942; ${esc(res.n)}</h2><h1 style="color:var(--v3)">${rank}</h1><p>${esc(what)}: <b>${t.done?'complete':'not finished'}</b></p><div style="font-size:3.5rem" class="bob">${'&#128142;'.repeat(res.gems)}</div><div class="row"><span class="badge">&#128142; ${res.gems} Gems</span><span class="badge">&#10004; ${res.right} of ${res.total} right first time</span><span class="badge">&#11088; ${res.pts} points</span></div><div class="row">${res.badges.map(b=>`<span class="badge" style="background:var(--gold)">${b}</span>`).join('')||'<span>Keep exploring to earn badges!</span>'}</div>${!prev&&quiz?'<p><b>The class has saved the whole Shape Kingdom!</b></p>':!prev&&left?`<p>Next: <b>${esc(missionName(SES.adv.m))}</b></p>`:''}<button class="primary" id="nx">${prev?'Back to setup':left?'Call Next Student &#9654;':'Class celebration &#127881;'}</button></div></div>`);
+ Snd.play('party');confetti();$('#nx').onclick=prev?showSetup:selectPlayer;
+}
+function showCelebration(){
+ const R=SES.results,gems=R.reduce((a,r)=>a+r.gems,0),saved=SES.adv.round>1;
+ view(`<div class="screen">${galaxy()}<div class="card col"><div style="font-size:5rem" class="bob">&#127881;&#128208;&#127942;</div><h1>${saved?'The Kingdom is saved!':'Great exploring!'}</h1><p>${esc(SES.cls)}: ${SES.done.length} explorer(s) played and collected <b>${gems} Gems</b>${SES.skip.length?`. Skipped: ${SES.skip.length}.`:'.'}</p><div class="row">${SES.done.map(n=>`<span class="badge">&#11088; ${esc(n)}</span>`).join('')}</div><div class="row">${SES.skip.length?'<button class="primary" id="back">Call skipped students</button>':''}<button id="again">Another round</button><button id="menu">Main menu</button></div></div></div>`);
+ Snd.play('party');confetti();later(confetti,1500);
+ if($('#back'))$('#back').onclick=()=>{SES.skip=[];save();selectPlayer()};
+ $('#again').onclick=()=>{SES.done=[];save();selectPlayer()};$('#menu').onclick=showHome;
+}
+function openTeacher(){
+ const turn=G.mode==='class'&&SES&&SES.current,playing=inPlay&&cur();
+ modal(`<h2>Teacher menu</h2>${SES?`<p>${esc(SES.cls)}: ${SES.names.length} students, ${SES.done.length} played, ${SES.skip.length} skipped, ${remaining().length} not finished</p>`:'<p>No class session yet.</p>'}
+ <div class="row">${turn?'<button id="tSkip">Skip absent student</button><button id="tEnd">End turn and show result</button>':''}${playing&&G.mode!=='solo'&&cur().m<MISSIONS.length?'<button id="tNextM">Skip this mission</button>':''}</div>
+ <div class="row">${SES?'<button id="tBoard">Leaderboard</button><button id="tDone">Completed students</button><button class="danger" id="tRestart">Restart classroom session</button><button class="danger" id="tReset">Reset session</button>':''}</div>
+ <div class="row"><button id="tHist">Score history</button><button class="primary" id="tSetup">Class setup</button><button id="tMenu">Main menu</button><button id="tClose">Close</button></div>`);
+ const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
+ on('#tClose',closeModal);on('#tMenu',showHome);on('#tSetup',()=>{showSetup();if(CC.tab==='auto'&&!CC.lib&&CC.code&&!CC.busy)loadCode(CC.code)});
+ on('#tSkip',()=>ask2(`Skip ${esc(SES.current.name)}?`,'Skip',skipCurrent));
+ on('#tEnd',()=>ask2('End this turn now?','End turn',finishTurn));
+ on('#tNextM',()=>{const t=cur();if(t.base){Object.assign(t,t.base);delete t.base}t.m++;t.mission=t.m;if(G.mode==='class'){SES.adv.m=t.m;save()}showMap()});
+ on('#tRestart',()=>ask2('Restart? Everyone can play again.','Restart',()=>{SES.done=[];SES.skip=[];SES.results=[];SES.current=null;SES.adv={m:0,round:1};save();selectPlayer()}));
+ on('#tReset',()=>ask2('Reset? This removes the current session.','Reset',()=>{SES=null;store.del('gq_session');G={mode:'',t:null};showSetup()}));
+ const page=h=>{modal(h+'<div class="row"><button id="bk">Back</button></div>');$('#bk').onclick=openTeacher};
+ on('#tBoard',()=>{const R=SES.results.slice().sort((a,b)=>b.pts-a.pts);page(`<h2>Session leaderboard</h2>${R.length?`<table><tr><th>#</th><th>Name</th><th>Points</th><th>Gems</th><th>Right</th><th>Mission</th><th>Rank</th></tr>${R.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.n)}</td><td>${r.pts}</td><td>${r.gems}</td><td>${r.right}/${r.total}</td><td>${esc(r.mission||'')}</td><td>${esc(r.rank)}</td></tr>`).join('')}</table>`:'<p>No finished turns yet.</p>'}`)});
+ on('#tDone',()=>{page(`<h2>Completed (${SES.done.length})</h2><p>${SES.done.map(esc).join(', ')||'None yet'}</p><h2>Skipped (${SES.skip.length})</h2><div class="row">${SES.skip.map((n,i)=>`<button class="ret" data-i="${i}">${esc(n)} &#8617; bring back</button>`).join('')||'<p>None</p>'}</div>`);
+  $$('.ret').forEach(b=>b.onclick=()=>{SES.skip.splice(+b.dataset.i,1);save();openTeacher()})});
+ on('#tHist',()=>{const H=store.get('gq_hist',[]);page(`<h2>Score history (this browser only)</h2>${H.length?`<table><tr><th>Date</th><th>Class</th><th>Name</th><th>Points</th><th>Mission</th><th>Rank</th></tr>${H.slice(-100).reverse().map(r=>`<tr><td>${esc(r.d)} ${esc(r.t)}</td><td>${esc(r.cls)}</td><td>${esc(r.n)}</td><td>${+r.pts}</td><td>${esc(r.mission||'')}</td><td>${esc(r.rank)}</td></tr>`).join('')}</table><div class="row"><button id="csv">Download CSV</button><button class="danger" id="clr">Clear history</button></div>`:'<p>Nothing saved yet.</p>'}`);
+  on('#csv',()=>{const q=s=>{s=String(s);if(/^[=+\-@]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};const csv=['Date,Time,Class,Name,Points,Gems,Right,Total,Mission,Rank'].concat(H.map(r=>[r.d,r.t,r.cls,r.n,r.pts,r.gems,r.right,r.total,r.mission||'',r.rank].map(q).join(','))).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv'}));a.download='geometry-scores.csv';a.click()});
+  on('#clr',()=>ask2('Clear all saved scores?','Clear',()=>{store.del('gq_hist');openTeacher()}))});
+}
+
+/* ================= ACTIVITY ENGINES ================= */
+function draggable(el,onDrop){
+ el.addEventListener('pointerdown',e=>{
+  e.preventDefault();let moved=false,ghost=null;const sx=e.clientX,sy=e.clientY,id=e.pointerId,ep=epoch;
+  const mv=ev=>{if(ev.pointerId!==id)return;if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<10)return;
+   if(!moved){moved=true;ghost=el.cloneNode(true);ghost.classList.add('ghost');document.body.appendChild(ghost);el.style.opacity=.35}
+   ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px'};
+  const up=ev=>{if(ev.pointerId!==id)return;removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);if(ghost)ghost.remove();el.style.opacity='';
+   if(ep!==epoch||ev.type==='pointercancel')return;
+   if(moved){const hit=document.elementFromPoint(ev.clientX,ev.clientY),z=hit&&hit.closest('[data-zone]');if(z){clearPick();onDrop(el,z)}}
+   else{const was=el.classList.contains('sel');clearPick();if(!was){el.classList.add('sel');picked={el,onDrop};Snd.play('click')}}};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+ });
+}
+function clearPick(){if(picked){picked.el.classList.remove('sel');picked=null}$$('.tile.sel').forEach(e=>e.classList.remove('sel'))}
+document.addEventListener('click',e=>{const z=e.target.closest('[data-zone]');if(z&&picked&&document.contains(picked.el)){const p=picked;clearPick();p.onDrop(p.el,z)}});
+const flashZone=k=>$$(`[data-zone="${k}"]`).forEach(c=>{c.classList.remove('glow');void c.getBoundingClientRect();c.classList.add('glow')});
+function bins(api,zones,cols){api.stage.innerHTML=`<div class="zones" style="grid-template-columns:repeat(${cols||zones.length},1fr);grid-auto-rows:1fr">${zones.map(z=>`<div class="zone" data-zone="${z.k}">${z.art||''}<span>${z.label||''}</span><div class="got"></div></div>`).join('')}</div>`}
+function placeGame(api,items,learn){
+ let left=items.length;
+ shuffle(items).forEach(it=>{
+  const b=document.createElement('div');b.className='tile';b.innerHTML=it.t;b.dataset.key=it.z;b.tabIndex=0;api.tray.appendChild(b);let missed=false;
+  draggable(b,(el,z)=>{
+   if(!document.contains(el))return;
+   if(z.dataset.zone===it.z){el.remove();good(it.why,missed);Snd.play('zap');const g=z.querySelector('.got');if(g)g.insertAdjacentHTML('beforeend',`<b>${it.t}</b>`);if(!--left)api.done(learn)}
+   else{missed=true;bad(it.why);el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),450);flashZone(it.z)}
+  });
+ });
+}
+function machine(api,zones,cards,learn,cols){
+ bins(api,zones,cols);const q=shuffle(cards);let i=0;
+ const next=()=>{if(i>=q.length)return api.done(learn);const it=q[i];let missed=false;api.tray.innerHTML=`<span class="badge">Card ${i+1} of ${q.length} &#9881;&#65039;</span>`;
+  const b=document.createElement('div');b.className='tile';b.innerHTML=it.t;b.dataset.key=it.z;b.style.maxWidth='44rem';api.tray.appendChild(b);
+  draggable(b,(el,z)=>{if(!document.contains(el))return;if(z.dataset.zone===it.z){el.remove();good(it.why,missed);Snd.play('zap');z.classList.add('glow');setTimeout(()=>z.classList.remove('glow'),700);i++;later(next,500)}else{missed=true;bad(it.why);flashZone(it.z)}})};
+ next();
+}
+function decide(api,rounds,learn){
+ let i=0;const next=()=>{if(i>=rounds.length)return api.done(learn);const r=rounds[i];let missed=0,locked=false;
+  api.ask(r.q);api.tray.innerHTML='';
+  api.stage.innerHTML=`<div class="col" style="gap:1rem"><div class="fig bob">${r.fig||`<div style="font-size:6rem">${r.icon||'&#129300;'}</div>`}</div><div class="row">${shuffle(r.opts.map((o,k)=>k)).map(k=>`<button class="gold opt" data-k="${k}" data-a="${k===r.a?1:0}">${r.opts[k]}</button>`).join('')}</div></div>`;
+  api.stage.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(locked)return;if(+b.dataset.k===r.a){locked=true;b.classList.add('on');good(r.why,missed);i++;later(next,2200)}else{missed++;b.disabled=true;bad(r.why);api.stage.querySelector(`[data-k="${r.a}"]`).classList.add('glow')}})};
+ next();
+}
+const svgPt=(svg,e)=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())};
+/* drag the pink arm to build an angle */
+function angleMaker(a,rounds,learn){
+ let i=0;
+ const next=()=>{
+  if(i>=rounds.length)return a.done(learn);
+  const r=rounds[i],g=r.given||0;let missed=0,locked=false;
+  const VX=400,VY=380,L=320;let th=Math.max(g,r.start!=null?r.start:(g?Math.min(175,g+30):(r.lo>100?40:150)));
+  a.ask(r.ask);
+  const P=(rad,ang)=>`${VX+rad*Math.cos(ang*Math.PI/180)} ${VY-rad*Math.sin(ang*Math.PI/180)}`;
+  const arc=(rad,a1,a2)=>a2-a1<.6?'':`M${P(rad,a1)} A${rad} ${rad} 0 0 0 ${P(rad,a2)}`;
+  a.stage.innerHTML=`<svg id="am" viewBox="0 0 800 440" data-lo="${r.lo}" data-hi="${r.hi}" data-vx="${VX}" data-vy="${VY}" data-l="${L}" style="touch-action:none;cursor:grab"><rect width="800" height="440" rx="24" fill="rgba(10,10,60,.55)" stroke="rgba(56,232,255,.5)" stroke-width="3"/>
+   <line x1="${VX-L}" y1="${VY}" x2="${VX}" y2="${VY}" stroke="rgba(255,255,255,.25)" stroke-width="4" stroke-dasharray="10 10"/>
+   <line x1="${VX}" y1="${VY}" x2="${VX+L}" y2="${VY}" stroke="#38e8ff" stroke-width="7" stroke-linecap="round"/>
+   ${g?`<line x1="${VX}" y1="${VY}" x2="${P(L,g).split(' ')[0]}" y2="${P(L,g).split(' ')[1]}" stroke="#38e8ff" stroke-width="7" stroke-linecap="round"/><path d="${arc(62,0,g)}" fill="none" stroke="#38e8ff" stroke-width="5"/><text x="${VX+100*Math.cos(g/2*Math.PI/180)}" y="${VY-100*Math.sin(g/2*Math.PI/180)+8}" text-anchor="middle" font-size="26" font-weight="900" fill="#38e8ff">${g}&deg;</text>`:''}
+   <path id="arcp" d="" fill="none" stroke="#ff4f9a" stroke-width="6"/><path id="rm" d="M${VX+34} ${VY} V${VY-34} H${VX}" fill="none" stroke="#ffd23f" stroke-width="5" opacity="0"/>
+   <line id="arm" x1="${VX}" y1="${VY}" x2="${VX}" y2="${VY}" stroke="#ff4f9a" stroke-width="8" stroke-linecap="round"/>
+   <circle cx="${VX}" cy="${VY}" r="10" fill="#fff"/><circle id="hd" r="26" fill="#ff4f9a" stroke="#fff" stroke-width="5" class="bob"/>
+   <text id="rd" x="${VX}" y="62" text-anchor="middle" font-size="52" font-weight="900" fill="#fff"></text></svg>`;
+  const svg=$('#am'),upd=()=>{const ex=VX+L*Math.cos(th*Math.PI/180),ey=VY-L*Math.sin(th*Math.PI/180);
+   $('#arm').setAttribute('x2',ex);$('#arm').setAttribute('y2',ey);$('#hd').setAttribute('cx',ex);$('#hd').setAttribute('cy',ey);
+   $('#arcp').setAttribute('d',g?arc(92,g,th):arc(80,0,th));$('#rm').setAttribute('opacity',Math.abs(th-90)<=3?1:0);
+   $('#rd').textContent=g?`Pink ${Math.round(th-g)}\u00B0   Total ${Math.round(th)}\u00B0`:`${Math.round(th)}\u00B0`;svg.dataset.th=Math.round(th)};
+  upd();
+  let on=false;const set=e=>{const p=svgPt(svg,e),dx=p.x-VX,dy=VY-p.y;let ang=Math.atan2(dy,dx)*180/Math.PI;if(dy<0)ang=dx>=0?0:180;th=Math.max(g,Math.min(180,Math.round(ang)));upd()};
+  svg.onpointerdown=e=>{on=true;try{svg.setPointerCapture(e.pointerId)}catch(_){}set(e)};svg.onpointermove=e=>{if(on)set(e)};svg.onpointerup=svg.onpointercancel=()=>on=false;
+  a.tray.innerHTML='<button class="gold big" id="lock">Lock it in</button>';
+  $('#lock').onclick=()=>{if(locked)return;const v=Math.round(th);
+   if(v>=r.lo&&v<=r.hi){locked=true;good(r.why,missed);Snd.play('zap');i++;later(next,2300)}
+   else{missed++;bad(`That is ${v}\u00B0. ${r.hint||'Try again.'}`);$('#hd').classList.add('glow')}};
+ };
+ next();
+}
+/* tap two cards that add up to the target */
+function pairMatch(a,total,vals,learn){
+ a.ask(`Tap two angles that add up to ${total}\u00B0.`);
+ a.stage.innerHTML=`<div class="row" style="max-width:62rem;gap:1rem">${shuffle(vals).map(v=>`<button class="gold need" data-v="${v}">${v}\u00B0</button>`).join('')}</div>`;
+ let first=null,left=vals.length/2,missed=false;
+ a.stage.querySelectorAll('.need').forEach(b=>b.onclick=()=>{
+  if(b.disabled)return;
+  if(!first){first=b;b.classList.add('pick');return}
+  if(first===b){b.classList.remove('pick');first=null;return}
+  const x=+first.dataset.v,y=+b.dataset.v;
+  if(x+y===total){first.classList.remove('pick');[first,b].forEach(e=>{e.classList.add('on');e.disabled=true});good(`${x}\u00B0 + ${y}\u00B0 = ${total}\u00B0.`,missed);missed=false;Snd.play('zap');first=null;if(!--left)a.done(learn)}
+  else{missed=true;bad(`${x}\u00B0 + ${y}\u00B0 = ${x+y}\u00B0, not ${total}\u00B0.`);first.classList.remove('pick');first=null}
+ });
+}
+function fractalGrow(a){
+ let n=0;a.ask('Grow the fractal! Tap the button to repeat the same simple step.');
+ const lab=['Step I','Step II','Step III','Step IV'];
+ const draw=()=>{a.stage.innerHTML=pic.sier(n,lab[n]);$('#cnt').textContent=`Coloured triangles: ${Math.pow(3,n)}`};
+ a.tray.innerHTML='<span class="badge" id="cnt"></span><button class="primary" id="grow">Grow &#10024;</button>';draw();
+ $('#grow').onclick=()=>{if(n>=2){$('#grow').disabled=true}n++;Snd.play('zap');draw();
+  if(n===3){feedback(true,'Same shape, smaller and smaller. That is self-similarity!');
+   later(()=>decide(a,[{q:'How many coloured triangles will Step IV have?',fig:pic.sier(3,'Step III'),opts:['12','18','27','81'],a:2,why:'Each step multiplies the triangles by 3: 1, 3, 9, then 27.'}],'A fractal repeats a simple step again and again, getting smaller each time.'),1700)}};
+}
+
+/* ================= MISSION CONTENT ================= */
+const PQ=(q,opts,a,why,extra={})=>({q,opts,a,why,...extra});
+const D1=[
+ PQ('What is this figure called?',['Line','Line segment','Ray','Point'],2,'A ray has one end point and goes on forever in one direction.',{fig:pic.ray()}),
+ PQ('How many end points does a ray have?',['0','1','2','3'],1,'A ray has exactly one end point.',{icon:'&#10145;&#65039;'}),
+ PQ('Line PQ and line QP are ...',['the same line','different lines','two rays','two points'],0,'Both names describe the same line.',{fig:pic.line()}),
+ PQ('The shortest distance between two points is shown by ...',['a curve','a zigzag path','a line segment','a wavy line'],2,'The straight line segment is the shortest path.',{icon:'&#128207;'}),
+ PQ('Which one can be measured completely with a ruler?',['A line','A ray','A line segment','None of these'],2,'A line segment has two end points, so its length is finite.',{fig:pic.seg()})];
+const D2=[
+ PQ('What type of angle is this?',['Acute angle','Right angle','Obtuse angle','Straight angle'],2,'An obtuse angle is between 90\u00B0 and 180\u00B0.',{fig:pic.ang(130)}),
+ PQ('An angle of exactly 90\u00B0 is called ...',['acute','right','obtuse','straight'],1,'A right angle is exactly 90\u00B0.',{fig:pic.ang(90)}),
+ PQ('What type of angle is this?',['Acute angle','Right angle','Obtuse angle','Straight angle'],0,'An acute angle is between 0\u00B0 and 90\u00B0.',{fig:pic.ang(35)}),
+ PQ('An angle of 0\u00B0 is called a ...',['zero angle','right angle','straight angle','obtuse angle'],0,'Two arms on top of each other make a zero angle.',{icon:'0\u00B0'}),
+ PQ('Which angle is exactly 180\u00B0?',['Acute','Right','Obtuse','Straight'],3,'A straight angle is 180\u00B0, a straight line.',{fig:pic.ang(180)})];
+const D3=[
+ PQ('Complementary angles add up to ...',['45\u00B0','90\u00B0','180\u00B0','360\u00B0'],1,'Complementary angles make 90\u00B0.',{icon:'&#128208;'}),
+ PQ('What is the complement of 40\u00B0?',['40\u00B0','50\u00B0','140\u00B0','60\u00B0'],1,'40\u00B0 + 50\u00B0 = 90\u00B0.',{icon:'40\u00B0'}),
+ PQ('Which pair is complementary?',['100\u00B0 and 80\u00B0','25\u00B0 and 65\u00B0','45\u00B0 and 55\u00B0','60\u00B0 and 60\u00B0'],1,'25\u00B0 + 65\u00B0 = 90\u00B0. The pair 100\u00B0 and 80\u00B0 adds to 180\u00B0 (supplementary).',{icon:'&#10067;'}),
+ PQ('What is the complement of 72\u00B0?',['18\u00B0','28\u00B0','108\u00B0','72\u00B0'],0,'72\u00B0 + 18\u00B0 = 90\u00B0.',{icon:'72\u00B0'})];
+const D4=[
+ PQ('Supplementary angles add up to ...',['90\u00B0','100\u00B0','180\u00B0','360\u00B0'],2,'Supplementary angles make 180\u00B0.',{icon:'&#127752;'}),
+ PQ('What is the supplement of 70\u00B0?',['20\u00B0','90\u00B0','110\u00B0','120\u00B0'],2,'70\u00B0 + 110\u00B0 = 180\u00B0.',{icon:'70\u00B0'}),
+ PQ('What is the supplement of 150\u00B0?',['30\u00B0','60\u00B0','150\u00B0','210\u00B0'],0,'150\u00B0 + 30\u00B0 = 180\u00B0.',{icon:'150\u00B0'}),
+ PQ('Which pair is supplementary?',['60\u00B0 and 30\u00B0','110\u00B0 and 70\u00B0','45\u00B0 and 45\u00B0','20\u00B0 and 80\u00B0'],1,'110\u00B0 + 70\u00B0 = 180\u00B0.',{icon:'&#10067;'})];
+const D5=[
+ PQ('A fractal is a pattern that ...',['never ends and repeats itself','stops after one step','has no pattern','is always a circle'],0,'A fractal is a never ending pattern that repeats itself at different scales.',{fig:pic.sier(3)}),
+ PQ('Self-similarity means ...',['small parts look like the whole pattern','the pattern has two equal halves','the pattern uses one colour','the pattern is drawn with a ruler'],0,'In a fractal, small parts look like the whole pattern.',{fig:pic.tree()}),
+ PQ('A fractal is made by repeating a ... process.',['simple','very hard','random','secret'],0,'Fractals are complex to look at but made by repeating a simple process.',{icon:'&#128260;'})];
+const asSteps=(...f)=>f;
+const plan=(all,short)=>full=>(full?all:short()).map(g=>a=>g(a,full));
+const dec=(D,n)=>(a,full)=>decide(a,full?shuffle(D).slice(0,n+1):shuffle(D).slice(0,2),'');
+function mkDecide(D,learn,nfull){return (a,full)=>decide(a,shuffle(D).slice(0,full?nfull:2),learn)}
+const nameBasics=a=>{a.ask('Name each picture! Drag the name onto the right figure.');
+ bins(a,[{k:'pt',art:pic.point()},{k:'ln',art:pic.line()},{k:'sg',art:pic.seg()},{k:'ry',art:pic.ray()}]);
+ placeGame(a,[{t:'Point',z:'pt',why:'A point is an exact position.'},{t:'Line',z:'ln',why:'A line has arrows at both ends: it never ends.'},{t:'Line segment',z:'sg',why:'A line segment has two end points.'},{t:'Ray',z:'ry',why:'A ray has one end point and an arrow on the other side.'}],
+ 'A <b>point</b> is an exact position. A <b>line</b> goes on forever both ways. A <b>line segment</b> has two end points. A <b>ray</b> has one end point and goes on forever one way.')};
+const sortLRS=(a,full)=>{a.ask('Line, Ray or Segment? Send each clue card to the right figure.');
+ let C=[{t:'Has two end points',z:'sg',why:'Two end points: a LINE SEGMENT.'},{t:'Goes on forever in both directions',z:'ln',why:'Both directions forever: a LINE.'},{t:'Has one end point',z:'ry',why:'One end point: a RAY.'},{t:'A part of a line with a fixed length',z:'sg',why:'A fixed length: a LINE SEGMENT.'},{t:'Goes on forever in one direction',z:'ry',why:'One direction forever: a RAY.'},{t:'Has no end points at all',z:'ln',why:'No end points: a LINE.'}];
+ if(!full)C=shuffle(C).slice(0,4);
+ machine(a,[{k:'ln',label:'Line',art:pic.line()},{k:'ry',label:'Ray',art:pic.ray()},{k:'sg',label:'Line segment',art:pic.seg()}],C,'Count the end points: <b>0</b> = line, <b>1</b> = ray, <b>2</b> = line segment.',3)};
+const makeTypes=(a,full)=>{let R=[
+ {ask:'Make a RIGHT angle (90\u00B0). Drag the pink arm.',lo:87,hi:93,why:'A right angle is exactly 90\u00B0. Note the little square!',hint:'A right angle looks like the corner of a book.'},
+ {ask:'Make an ACUTE angle (less than 90\u00B0).',lo:5,hi:85,why:'An acute angle is between 0\u00B0 and 90\u00B0.',hint:'Acute means smaller than a right angle.'},
+ {ask:'Make an OBTUSE angle (more than 90\u00B0, less than 180\u00B0).',lo:95,hi:175,why:'An obtuse angle is between 90\u00B0 and 180\u00B0.',hint:'Obtuse means wider than a right angle but not a straight line.'},
+ {ask:'Make a STRAIGHT angle (180\u00B0).',lo:178,hi:180,why:'A straight angle is 180\u00B0: a straight line.',hint:'Open the arm all the way until it makes a straight line.'}];
+ if(!full)R=shuffle(R).slice(0,3);
+ angleMaker(a,R,'<b>Acute</b> &lt; 90\u00B0. <b>Right</b> = 90\u00B0. <b>Obtuse</b> between 90\u00B0 and 180\u00B0. <b>Straight</b> = 180\u00B0.')};
+const nameAngles=a=>{a.ask('Name each angle! Drag the name onto the right picture.');
+ bins(a,[{k:'ac',art:pic.ang(35)},{k:'rt',art:pic.ang(90)},{k:'ob',art:pic.ang(130)},{k:'st',art:pic.ang(180)}]);
+ placeGame(a,[{t:'Acute angle',z:'ac',why:'Smaller than 90\u00B0: ACUTE.'},{t:'Right angle',z:'rt',why:'The square mark means 90\u00B0: RIGHT.'},{t:'Obtuse angle',z:'ob',why:'Wider than a right angle: OBTUSE.'},{t:'Straight angle',z:'st',why:'A straight line is 180\u00B0: STRAIGHT.'}],'You can now name acute, right, obtuse and straight angles!')};
+const makeComp=(a,full)=>{let R=[40,65,20].map(g=>({given:g,lo:87,hi:93,ask:`The blue angle is ${g}\u00B0. Drag the pink arm so the two angles make a RIGHT angle (90\u00B0).`,why:`${g}\u00B0 + ${90-g}\u00B0 = 90\u00B0. The complement of ${g}\u00B0 is ${90-g}\u00B0.`,hint:'Together the two angles must make the corner of a square.'}));
+ if(!full)R=R.slice(0,2);
+ angleMaker(a,R,'<b>Complementary angles</b> add up to <b>90\u00B0</b>.')};
+const pairs90=a=>pairMatch(a,90,[25,65,40,50,10,80,35,55],'Complementary pairs always add up to <b>90\u00B0</b>.');
+const makeSupp=(a,full)=>{let R=[130,70,95].map(g=>({given:g,lo:177,hi:180,ask:`The blue angle is ${g}\u00B0. Drag the pink arm to make a STRAIGHT line (180\u00B0).`,why:`${g}\u00B0 + ${180-g}\u00B0 = 180\u00B0. The supplement of ${g}\u00B0 is ${180-g}\u00B0.`,hint:'Together the two angles must make a straight line.'}));
+ if(!full)R=R.slice(0,2);
+ angleMaker(a,R,'<b>Supplementary angles</b> add up to <b>180\u00B0</b>.')};
+const pairs180=a=>pairMatch(a,180,[100,80,120,60,150,30,110,70],'Supplementary pairs always add up to <b>180\u00B0</b>.');
+const fractalSort=a=>{a.ask('Fractal or not? Send each picture to the right box.');
+ machine(a,[{k:'y',label:'FRACTAL',art:'<div style="font-size:3.5rem">&#10024;</div>'},{k:'n',label:'NOT a fractal',art:'<div style="font-size:3.5rem">&#128683;</div>'}],
+ [{t:pic.sier(3),z:'y',why:'The same triangle pattern repeats in smaller and smaller sizes: a fractal.'},{t:pic.tree(),z:'y',why:'Every branch splits into smaller copies of itself: a fractal tree.'},{t:pic.sq(),z:'n',why:'A plain square does not repeat in smaller copies.'},{t:pic.circ(),z:'n',why:'A plain circle is not a repeating pattern.'}],
+ 'A fractal repeats the same shape in smaller and smaller sizes. Plain shapes are not fractals.',2)};
+const finalQ=(a,full)=>decide(a,shuffle([].concat(D1,D2,D3,D4,D5)).slice(0,full?8:5),'You know your lines, angles and fractals. You are a Geometry Hero!');
+const finalAngles=(a,full)=>angleMaker(a,shuffle([{given:35,lo:87,hi:93,ask:'The blue angle is 35\u00B0. Make a RIGHT angle (90\u00B0) with the pink arm.',why:'35\u00B0 + 55\u00B0 = 90\u00B0 (complementary).',hint:'Aim for 90\u00B0 in total.'},{given:100,lo:177,hi:180,ask:'The blue angle is 100\u00B0. Make a STRAIGHT line (180\u00B0) with the pink arm.',why:'100\u00B0 + 80\u00B0 = 180\u00B0 (supplementary).',hint:'Aim for 180\u00B0 in total.'}]).slice(0,full?2:1),'');
+const bgc=(a,b)=>`linear-gradient(${a},${b})`;
+MISSIONS.push(
+{name:'Points, Lines and Rays',short:'Lines & Rays',icon:'&#128205;',badge:'&#128205; Line Master',bg:bgc('#13307a','#6a2cb8'),story:'The Shape Kingdom has lost its first road! Rebuild it from points, lines and rays.',how:'Drag names onto pictures and sort the clue cards.',steps:plan([nameBasics,sortLRS,mkDecide(D1,'Great work on points, lines, segments and rays!',4)],()=>[nameBasics,one(sortLRS,mkDecide(D1,'Great work!',2))])},
+{name:'Angle Academy',short:'Angle Academy',icon:'&#128208;',badge:'&#128208; Angle Ace',bg:bgc('#0f4a7a','#2a1a8f'),story:'The Angle Academy needs new teachers. Show you can build every kind of angle!',how:'Drag the pink arm to build angles. Then name them.',steps:plan([makeTypes,nameAngles,mkDecide(D2,'Angles are no problem for you!',4)],()=>[makeTypes,one(nameAngles,mkDecide(D2,'Great work!',2))])},
+{name:'Complementary Cove',short:'Complementary',icon:'&#127965;&#65039;',badge:'&#127965;&#65039; Complement Captain',bg:bgc('#0a5f7a','#3b1f8f'),story:'Two angles that make a right angle are best friends. Find every pair!',how:'Drag the arm to 90\u00B0 total and match the pairs.',steps:plan([makeComp,pairs90,mkDecide(D3,'Complementary angles make 90\u00B0!',4)],()=>[makeComp,one(pairs90,mkDecide(D3,'Great work!',2))])},
+{name:'Supplementary Skies',short:'Supplementary',icon:'&#9729;&#65039;',badge:'&#127752; Supplement Star',bg:bgc('#5b2a8c','#e0306e'),story:'High in the sky, angle pairs make a perfectly straight line. Complete them!',how:'Drag the arm to make 180\u00B0 and match the pairs.',steps:plan([makeSupp,pairs180,mkDecide(D4,'Supplementary angles make 180\u00B0!',4)],()=>[makeSupp,one(pairs180,mkDecide(D4,'Great work!',2))])},
+{name:'Fractal Forest',short:'Fractal Forest',icon:'&#127794;',badge:'&#127794; Fractal Explorer',bg:bgc('#0b6b4a','#2a1a8f'),story:'The Fractal Forest grows by repeating one simple step. Watch it grow and spot the fractals!',how:'Tap to grow the fractal and sort the pictures.',steps:plan([fractalGrow,fractalSort,mkDecide(D5,'Fractals repeat a simple step forever!',3)],()=>[fractalGrow,one(fractalSort,mkDecide(D5,'Great work!',2))])},
+{name:'The Royal Geometry Test',short:'Royal Test',icon:'&#128081;',badge:'&#128081; Geometry Hero',bg:bgc('#7a1f5a','#2a1a8f'),story:'All five places are saved! Pass one last test to restore the whole Shape Kingdom.',how:'Answer the questions and build two angles.',steps:plan([finalAngles,finalQ],()=>[finalQ])}
+);
+showHome();
+</script>
+</body>
+</html>
